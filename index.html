@@ -1,0 +1,189 @@
+<!-- index.html (Updated) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-ray Imaging Parameter Simulator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-x-ray"></i> X-ray Imaging Parameter Simulator</h1>
+            <p class="subtitle">Upload an X-ray image and see how technical factors affect image quality</p>
+        </header>
+
+        <main>
+            <div class="simulator-container">
+                <div class="control-panel">
+                    <h2><i class="fas fa-sliders-h"></i> Technical Parameters</h2>
+                    
+                    <div class="parameter-group">
+                        <div class="parameter">
+                            <label for="kv">
+                                <i class="fas fa-bolt"></i> kV (Kilovoltage)
+                                <span class="value-display" id="kv-value">70</span>
+                            </label>
+                            <input type="range" id="kv" min="40" max="120" value="70" step="1">
+                            <div class="range-labels">
+                                <span>Low (40)</span>
+                                <span>Medium (80)</span>
+                                <span>High (120)</span>
+                            </div>
+                            <p class="param-description">Controls beam penetration and contrast. Higher kV increases penetration but reduces contrast.</p>
+                        </div>
+
+                        <div class="parameter">
+                            <label for="ma">
+                                <i class="fas fa-tachometer-alt"></i> mA (Milliamperage)
+                                <span class="value-display" id="ma-value">200</span>
+                            </label>
+                            <input type="range" id="ma" min="10" max="500" value="200" step="10">
+                            <div class="range-labels">
+                                <span>Low (10)</span>
+                                <span>Medium (250)</span>
+                                <span>High (500)</span>
+                            </div>
+                            <p class="param-description">Controls X-ray quantity (photon flux). Higher mA increases image brightness and reduces noise.</p>
+                        </div>
+
+                        <div class="parameter">
+                            <label for="time">
+                                <i class="fas fa-clock"></i> Time (seconds)
+                                <span class="value-display" id="time-value">0.10</span>
+                            </label>
+                            <input type="range" id="time" min="0.02" max="2" value="0.10" step="0.02">
+                            <div class="range-labels">
+                                <span>Short (0.02)</span>
+                                <span>Medium (0.50)</span>
+                                <span>Long (2.00)</span>
+                            </div>
+                            <p class="param-description">Exposure duration. Longer time increases brightness but may cause motion blur.</p>
+                        </div>
+
+                        <div class="parameter">
+                            <label for="filter">
+                                <i class="fas fa-filter"></i> Filter Thickness (mm Al)
+                                <span class="value-display" id="filter-value">2.5</span>
+                            </label>
+                            <input type="range" id="filter" min="0" max="5" value="2.5" step="0.5">
+                            <div class="range-labels">
+                                <span>None (0)</span>
+                                <span>Medium (2.5)</span>
+                                <span>Thick (5.0)</span>
+                            </div>
+                            <p class="param-description">Removes low-energy photons, reducing patient dose but requiring higher exposure.</p>
+                        </div>
+                    </div>
+
+                    <div class="upload-section">
+                        <h3><i class="fas fa-cloud-upload-alt"></i> Upload Custom Image</h3>
+                        <div class="upload-area" id="upload-area">
+                            <i class="fas fa-file-upload"></i>
+                            <p>Drag & drop or click to upload X-ray image</p>
+                            <input type="file" id="image-upload" accept="image/*">
+                            <label for="image-upload" class="btn upload-btn">Choose File</label>
+                            <p class="upload-note">Supports JPG, PNG, GIF (max 5MB)</p>
+                        </div>
+                        <div id="image-preview" class="image-preview"></div>
+                    </div>
+
+                    <div class="buttons">
+                        <button id="reset-btn" class="btn reset"><i class="fas fa-redo"></i> Reset Parameters</button>
+                        <button id="export-btn" class="btn export"><i class="fas fa-download"></i> Export Image</button>
+                        <button id="sample-btn" class="btn sample"><i class="fas fa-image"></i> Load Sample</button>
+                    </div>
+                </div>
+
+                <div class="image-display">
+                    <div class="image-header">
+                        <h2><i class="fas fa-image"></i> X-ray Image Preview</h2>
+                        <div class="image-metrics">
+                            <div class="metric">
+                                <span class="metric-label">Brightness:</span>
+                                <span class="metric-value" id="brightness-value">Medium</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Contrast:</span>
+                                <span class="metric-value" id="contrast-value">Good</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Noise:</span>
+                                <span class="metric-value" id="noise-value">Low</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="image-container">
+                        <div class="image-wrapper">
+                            <canvas id="xray-canvas"></canvas>
+                            <div class="image-controls">
+                                <button id="zoom-in" class="control-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+                                <button id="zoom-out" class="control-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+                                <button id="reset-view" class="control-btn" title="Reset View"><i class="fas fa-expand-arrows-alt"></i></button>
+                            </div>
+                        </div>
+                        <div class="image-footer">
+                            <div class="dose-display">
+                                <i class="fas fa-radiation"></i>
+                                <span>Estimated Dose: <strong id="dose-value">1.2 mGy</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="image-info">
+                        <div class="info-row">
+                            <span class="info-label">Current Settings:</span>
+                            <span id="current-settings" class="info-value">kV: 70, mA: 200, Time: 0.10s, Filter: 2.5mm</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Image Status:</span>
+                            <span id="image-status" class="info-value">Simulated X-ray (Upload an image to begin)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-section">
+                    <h3><i class="fas fa-lightbulb"></i> How Parameters Affect Image Quality</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4><i class="fas fa-bolt"></i> Kilovoltage (kV) - <span class="effect-demo">Contrast Control</span></h4>
+                            <p>Higher kV increases beam penetration, reducing contrast but allowing visualization of thicker tissues. Lower kV provides better contrast for soft tissue differentiation.</p>
+                            <div class="effect-demo-bar">
+                                <div class="demo-label">Low kV = High Contrast</div>
+                                <div class="demo-bar contrast-bar">
+                                    <div class="demo-fill" style="width: 70%;"></div>
+                                </div>
+                                <div class="demo-label">High kV = Low Contrast</div>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <h4><i class="fas fa-tachometer-alt"></i> Milliamperage (mA) - <span class="effect-demo">Brightness & Noise</span></h4>
+                            <p>Higher mA increases photon flux, producing a brighter image with less quantum noise. However, it increases patient radiation dose.</p>
+                            <div class="effect-demo-bar">
+                                <div class="demo-label">Low mA = Dark & Noisy</div>
+                                <div class="demo-bar brightness-bar">
+                                    <div class="demo-fill" style="width: 80%;"></div>
+                                </div>
+                                <div class="demo-label">High mA = Bright & Clear</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>X-ray Imaging Parameter Simulator | Upload your own X-ray images to see parameter effects</p>
+            <p class="footer-note">This simulation demonstrates relationships between technical factors and image quality. Actual clinical images require professional training and judgment.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
