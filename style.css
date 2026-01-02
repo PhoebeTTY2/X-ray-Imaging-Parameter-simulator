@@ -619,3 +619,59 @@ footer p {
         grid-template-columns: 1fr;
     }
 }
+
+/* 1. Ensure the main container doesn't overflow */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* 2. Make the simulator layout change from side-by-side to stacked */
+.simulator-container {
+    display: flex;
+    flex-direction: row; /* Side by side on desktop */
+    gap: 20px;
+    width: 100%;
+}
+
+/* 3. MOBILE FIX: When screen is less than 768px wide */
+@media (max-width: 768px) {
+    .simulator-container {
+        flex-direction: column; /* Stacks controls on top of the image */
+    }
+
+    .control-panel, .image-display {
+        width: 100%; /* Take up full width on phone */
+    }
+
+    h1 {
+        font-size: 1.5rem; /* Shrink title slightly for small screens */
+    }
+
+    .parameter-group {
+        padding: 10px;
+    }
+
+    /* Make buttons easier to tap with fingers */
+    .btn {
+        padding: 12px;
+        width: 100%; 
+        margin-bottom: 10px;
+    }
+}
+
+/* 4. Ensure the canvas adjusts its height automatically */
+.image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 400px; /* Default height */
+}
+
+@media (max-width: 480px) {
+    .image-wrapper {
+        height: 300px; /* Shorter height for small phones */
+    }
+}
